@@ -43,6 +43,10 @@ class Parser:
             TokenType.LT) or self.checkToken(TokenType.LTEQ) or self.checkToken(TokenType.EQEQ) or self.checkToken(
             TokenType.NOTEQ)
 
+    # Return true if the current token is a logical operator.
+    def isLogicalOperator(self):
+        return self.checkToken(TokenType.AND) or self.checkToken(TokenType.OR)
+
     def abort(self, message):
         sys.exit("Error. " + message)
 
@@ -93,7 +97,7 @@ class Parser:
         elif self.checkToken(TokenType.IF):
             self.nextToken()
             self.emitter.emit("if(")
-            self.comparison()
+            self.logicalExpression()
 
             self.match(TokenType.THEN)
             self.nl()
@@ -110,7 +114,7 @@ class Parser:
             while self.checkToken(TokenType.ELSEIF):
                 self.nextToken()
                 self.emitter.emit("else if(")
-                self.comparison()
+                self.logicalExpression()
 
                 self.match(TokenType.THEN)
                 self.nl()
@@ -139,7 +143,7 @@ class Parser:
         elif self.checkToken(TokenType.WHILE):
             self.nextToken()
             self.emitter.emit("while(")
-            self.comparison()
+            self.logicalExpression()
 
             self.match(TokenType.REPEAT)
             self.nl()
@@ -150,6 +154,49 @@ class Parser:
                 self.statement()
 
             self.match(TokenType.ENDWHILE)
+            self.emitter.emitLine("}")
+
+        # "FOR" ident "=" expression "TO" expression ["STEP" expression] "NEXT"
+        elif self.checkToken(TokenType.FOR):
+            self.nextToken()
+
+            # Store the variable name
+            varName = self.curToken.text
+
+            # Check if the variable exists, if not declare it
+            if varName not in self.symbols:
+                self.symbols.add(varName)
+                self.emitter.headerLine("float " + varName + ";")
+
+            self.match(TokenType.IDENT)
+            self.match(TokenType.EQ)
+
+            # Initialization: for(var = start; ...
+            self.emitter.emit("for(" + varName + " = ")
+            self.expression()
+
+            # Condition: ...; var <= end; ...
+            self.match(TokenType.TO)
+            self.emitter.emit("; " + varName + " <= ")
+            self.expression()
+
+            # Increment: ...; var += step)
+            if self.checkToken(TokenType.STEP):
+                self.nextToken()
+                self.emitter.emit("; " + varName + " += ")
+                self.expression()
+            else:
+                # Default step is 1
+                self.emitter.emit("; " + varName + " += 1")
+
+            self.emitter.emitLine("){")
+            self.nl()
+
+            # Parse the FOR block
+            while not self.checkToken(TokenType.NEXT):
+                self.statement()
+
+            self.match(TokenType.NEXT)
             self.emitter.emitLine("}")
 
         # "LABEL" ident
@@ -211,6 +258,27 @@ class Parser:
         # Newline.
         self.nl()
 
+    # logicalExpression ::= logical {("&&" | "||") logical}
+    def logicalExpression(self):
+        self.logical()
+
+        # Can have 0 or more logical operators and expressions
+        while self.isLogicalOperator():
+            if self.checkToken(TokenType.AND):
+                self.emitter.emit(" && ")
+            else:  # TokenType.OR
+                self.emitter.emit(" || ")
+            self.nextToken()
+            self.logical()
+
+    # logical ::= ["!"] comparison
+    def logical(self):
+        # Check for NOT operator
+        if self.checkToken(TokenType.NOT):
+            self.emitter.emit("!")
+            self.nextToken()
+        self.comparison()
+
     # comparison ::= expression (("==" | "!=" | ">" | ">=" | "<" | "<=") expression)+
     def comparison(self):
         self.expression()
@@ -234,7 +302,6 @@ class Parser:
             self.nextToken()
             self.term()
 
-
     # term ::= unary {( "/" | "*" ) unary}
     def term(self):
         self.unary()
@@ -243,7 +310,6 @@ class Parser:
             self.emitter.emit(self.curToken.text)
             self.nextToken()
             self.unary()
-
 
     # unary ::= ["+" | "-"] primary
     def unary(self):
