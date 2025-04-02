@@ -4,32 +4,6 @@
 LETEMCOOK x = 10
 LETEMCOOK y = 5
 
-# Print variables and expressions
-TUAH "Testing the compiler"
-TUAH x
-TUAH y
-TUAH x + y
-TUAH x * y
-
-# Input example
-TUAH "Enter a number:"
-HAWK z
-
-# If statement with various conditions
-GOON z > 10 THEN
-    TUAH "z is greater than 10"
-    LETEMCOOK result = z * 2
-    TUAH result
-EDGING z == 10 THEN
-    TUAH "z equals 10"
-    LETEMCOOK result = z + 50
-    TUAH result
-EDGE
-    TUAH "z is less than 10"
-    LETEMCOOK result = z / 2
-    TUAH result
-BUSS
-
 # Label and goto
 LIGMA start
 TUAH "This is a label test"
