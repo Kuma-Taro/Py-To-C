@@ -45,7 +45,7 @@ class Parser:
 
     # Return true if the current token is a logical operator.
     def isLogicalOperator(self):
-        return self.checkToken(TokenType.AND) or self.checkToken(TokenType.OR)
+        return self.checkToken(TokenType.SHIP) or self.checkToken(TokenType.LOWKEY)
 
     def abort(self, message):
         sys.exit("Error. " + message)
@@ -72,14 +72,14 @@ class Parser:
         # Check that each label referenced in a GOTO is declared.
         for label in self.labelsGotoed:
             if label not in self.labelsDeclared:
-                self.abort("Attempting to GOTO to undeclared label: " + label)
+                self.abort("Attempting to SKEDADDLE to undeclared label: " + label)
 
     # One of the following statements...
     def statement(self):
         # Check the first token to see what kind of statement this is.
 
-        # "PRINT" (expression | string)
-        if self.checkToken(TokenType.PRINT):
+        # "TUAH" (expression | string)
+        if self.checkToken(TokenType.TUAH):
             self.nextToken()
 
             if self.checkToken(TokenType.STRING):
@@ -93,8 +93,8 @@ class Parser:
                 self.expression()
                 self.emitter.emitLine("));")
 
-        # "IF" comparison "THEN" block "ENDIF"
-        elif self.checkToken(TokenType.IF):
+        # "GOON" comparison "THEN" block "BUSS"
+        elif self.checkToken(TokenType.GOON):
             self.nextToken()
             self.emitter.emit("if(")
             self.logicalExpression()
@@ -104,14 +104,14 @@ class Parser:
             self.emitter.emitLine("){")
 
             # Parse the IF block
-            while not (self.checkToken(TokenType.ELSEIF) or self.checkToken(TokenType.ELSE) or self.checkToken(
-                    TokenType.ENDIF)):
+            while not (self.checkToken(TokenType.EDGING) or self.checkToken(TokenType.EDGE) or self.checkToken(
+                    TokenType.BUSS)):
                 self.statement()
 
             self.emitter.emitLine("}")
 
-            # Handle ELSEIF blocks
-            while self.checkToken(TokenType.ELSEIF):
+            # Handle EDGING blocks
+            while self.checkToken(TokenType.EDGING):
                 self.nextToken()
                 self.emitter.emit("else if(")
                 self.logicalExpression()
@@ -120,44 +120,44 @@ class Parser:
                 self.nl()
                 self.emitter.emitLine("){")
 
-                while not (self.checkToken(TokenType.ELSEIF) or self.checkToken(TokenType.ELSE) or self.checkToken(
-                        TokenType.ENDIF)):
+                while not (self.checkToken(TokenType.EDGING) or self.checkToken(TokenType.EDGE) or self.checkToken(
+                        TokenType.BUSS)):
                     self.statement()
 
                 self.emitter.emitLine("}")
 
-            # Handle ELSE block
-            if self.checkToken(TokenType.ELSE):
+            # Handle EDGE block
+            if self.checkToken(TokenType.EDGE):
                 self.nextToken()
                 self.nl()
                 self.emitter.emitLine("else {")
 
-                while not self.checkToken(TokenType.ENDIF):
+                while not self.checkToken(TokenType.BUSS):
                     self.statement()
 
                 self.emitter.emitLine("}")
 
-            self.match(TokenType.ENDIF)
+            self.match(TokenType.BUSS)
 
-        # "WHILE" comparison "REPEAT" block "ENDWHILE"
-        elif self.checkToken(TokenType.WHILE):
+        # "VIBING" comparison "RUNITBACK" block "GGS"
+        elif self.checkToken(TokenType.VIBING):
             self.nextToken()
             self.emitter.emit("while(")
             self.logicalExpression()
 
-            self.match(TokenType.REPEAT)
+            self.match(TokenType.RUNITBACK)
             self.nl()
             self.emitter.emitLine("){")
 
             # Zero or more statements in the loop body.
-            while not self.checkToken(TokenType.ENDWHILE):
+            while not self.checkToken(TokenType.GGS):
                 self.statement()
 
-            self.match(TokenType.ENDWHILE)
+            self.match(TokenType.GGS)
             self.emitter.emitLine("}")
 
-        # "FOR" ident "=" expression "TO" expression ["STEP" expression] "NEXT"
-        elif self.checkToken(TokenType.FOR):
+        # "GRINDING" ident "=" expression "TO" expression ["STEP" expression] "NEXT"
+        elif self.checkToken(TokenType.GRINDING):
             self.nextToken()
 
             # Store the variable name
@@ -199,8 +199,8 @@ class Parser:
             self.match(TokenType.NEXT)
             self.emitter.emitLine("}")
 
-        # "LABEL" ident
-        elif self.checkToken(TokenType.LABEL):
+        # "LIGMA" ident
+        elif self.checkToken(TokenType.LIGMA):
             self.nextToken()
 
             # Make sure this label doesn't already exist.
@@ -211,15 +211,15 @@ class Parser:
             self.emitter.emitLine(self.curToken.text + ":")
             self.match(TokenType.IDENT)
 
-        # "GOTO" ident
-        elif self.checkToken(TokenType.GOTO):
+        # "SKEDADDLE" ident
+        elif self.checkToken(TokenType.SKEDADDLE):
             self.nextToken()
             self.labelsGotoed.add(self.curToken.text)
             self.emitter.emitLine("goto " + self.curToken.text + ";")
             self.match(TokenType.IDENT)
 
-        # "LET" ident = expression
-        elif self.checkToken(TokenType.LET):
+        # "LETEMCOOK" ident = expression
+        elif self.checkToken(TokenType.LETEMCOOK):
             self.nextToken()
 
             #  Check if ident exists in symbol table. If not, declare it.
@@ -234,8 +234,8 @@ class Parser:
             self.expression()
             self.emitter.emitLine(";")
 
-        # "INPUT" ident
-        elif self.checkToken(TokenType.INPUT):
+        # "HAWK" ident
+        elif self.checkToken(TokenType.HAWK):
             self.nextToken()
 
             # If variable doesn't already exist, declare it.
@@ -264,9 +264,9 @@ class Parser:
 
         # Can have 0 or more logical operators and expressions
         while self.isLogicalOperator():
-            if self.checkToken(TokenType.AND):
+            if self.checkToken(TokenType.SHIP):
                 self.emitter.emit(" && ")
-            else:  # TokenType.OR
+            else:  # TokenType.LOWKEY
                 self.emitter.emit(" || ")
             self.nextToken()
             self.logical()
@@ -274,7 +274,7 @@ class Parser:
     # logical ::= ["!"] comparison
     def logical(self):
         # Check for NOT operator
-        if self.checkToken(TokenType.NOT):
+        if self.checkToken(TokenType.AINT):
             self.emitter.emit("!")
             self.nextToken()
         self.comparison()

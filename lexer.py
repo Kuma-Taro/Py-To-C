@@ -42,10 +42,10 @@ class Lexer:
             token = Token('--', TokenType.DEC)
         elif self.curChar == '&' and self.peek() == '&':
             self.nextChar()
-            token = Token('&&', TokenType.AND)
+            token = Token('&&', TokenType.SHIP)
         elif self.curChar == '|' and self.peek() == '|':
             self.nextChar()
-            token = Token('||', TokenType.OR)
+            token = Token('||', TokenType.LOWKEY)
         elif self.curChar == '=' and self.peek() == '=':
             self.nextChar()
             token = Token('==', TokenType.EQEQ)
@@ -75,7 +75,7 @@ class Lexer:
         elif self.curChar == '<':
             token = Token(self.curChar, TokenType.LT)
         elif self.curChar == '!':
-            token = Token(self.curChar, TokenType.NOT)
+            token = Token(self.curChar, TokenType.AINT)
 
         # String literals
         elif self.curChar == '\"':
@@ -144,29 +144,29 @@ class TokenType(enum.Enum):
     IDENT = 2
     STRING = 3
 
-    # Keywords
-    LABEL = 101
-    GOTO = 102
-    PRINT = 103
-    INPUT = 104
-    LET = 105
-    IF = 106
-    THEN = 107
-    ENDIF = 108
-    ELSE = 112
-    ELSEIF = 113
-    WHILE = 109
-    REPEAT = 110
-    ENDWHILE = 111
-    FOR = 114
-    TO = 115
-    STEP = 116
-    NEXT = 117
+    # Keywords (renamed based on the image)
+    LIGMA = 101      # Originally LABEL
+    SKEDADDLE = 102  # Originally GOTO
+    TUAH = 103       # Originally PRINT
+    HAWK = 104       # Originally INPUT
+    LETEMCOOK = 105   # Originally LET
+    GOON = 106       # Originally IF
+    THEN = 107       # No change
+    BUSS = 108       # Originally ENDIF
+    VIBING = 109     # Originally WHILE
+    RUNITBACK = 110  # Originally REPEAT
+    GGS = 111        # Originally ENDWHILE
+    EDGE = 112       # Originally ELSE
+    EDGING = 113     # Originally ELSEIF
+    GRINDING = 114   # Originally FOR
+    TO = 115         # No change
+    STEP = 116       # No change
+    NEXT = 117       # No change
 
-    # Logical operators
-    AND = 118
-    OR = 119
-    NOT = 120
+    # Logical operators (renamed)
+    SHIP = 118       # Originally AND
+    LOWKEY = 119     # Originally OR
+    AINT = 120       # Originally NOT
 
     # Operators
     EQ = 201
