@@ -3,12 +3,13 @@ The brainrot compiler compiles a custom file with a .skbd at the end. The langua
 unique because it uses gen-z slang as a substitute for Python keywords and converts it into C language.
 
 How to Run the Compiler
-To run the compiler, type python skbd.py [filename.skdb] in a terminal.
+To run the compiler, type python3 skbd.py (filename).skdb in a terminal. Make sure that every file is in the same folder.
 After entering the command, it should output:
 """
 SK.bd Compiler
 Compiling completed.
 """
+If there is an error about python3 not being found, type python skdb.py (filename).skbd
 
 Syntax Rules
 As for the syntax rules, it follows the standard syntax of Python except for the keywords.
